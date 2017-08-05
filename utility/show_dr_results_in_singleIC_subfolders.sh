@@ -13,7 +13,7 @@ mkdir -p $parent_folder/results
 
 OUTPUT_MASK_RESULT_ROOT_PATH=""; 
 result_file=$parent_folder/results/RSN_$RSN_LABEL"_results.txt"
-subanal_initials=""  # e.g. "Fear"
+subanalysis_wilcard=""  # e.g. "Fear"
 image_root_name="corrp"
 CALC_SIGN_VOL=0;
 SHOW_IMAGE=0
@@ -33,7 +33,7 @@ do
 		-vol)			CALC_SIGN_VOL=$2; shift;;
 		-showimg)	SHOW_IMAGE=$2; shift;;
 		-wrsign)	WRITE_ONLY_SIGNIFICANT=$2;shift;;		
-		-sai)			subanal_initials=$2;shift;;
+		-saw)			subanalysis_wilcard=$2;shift;;
 		*)  break;;
 	esac
 	shift
@@ -105,7 +105,7 @@ do
 	parse_image;
 done
 
-for sub_dir in $INPUT_FOLDER/*$subanal_initials*
+for sub_dir in $INPUT_FOLDER/*$subanalysis_wilcard*
 do
 	if [ -d $sub_dir ]; then	
 		echo "--------------------------------------------------------------------------------------" >> $result_file
