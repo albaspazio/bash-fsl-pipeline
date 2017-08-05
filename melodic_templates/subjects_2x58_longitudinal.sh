@@ -1,0 +1,10 @@
+template_name=subjects_2x58_longitudinal
+TEMPLATE_MELODIC_IC=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects_2x58_longitudinal/melodic_IC.nii.gz
+TEMPLATE_MASK_IMAGE=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects_2x58_longitudinal/mask.nii.gz
+TEMPLATE_BG_IMAGE=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects_2x58_longitudinal/bg_image.nii.gz
+TEMPLATE_STATS_FOLDER=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects_2x58_longitudinal/stats
+TEMPLATE_MASK_FOLDER=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects_2x58_longitudinal/stats
+str_pruning_ic_id=() # valid RSN: you must set their id values removing 1: if in the html is the 6th RSN, you must write 5!!!!!!
+str_arr_IC_labels=()
+declare -a arr_IC_labels=()
+declare -a arr_pruning_ic_id=()

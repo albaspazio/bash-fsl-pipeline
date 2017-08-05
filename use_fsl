@@ -1,0 +1,39 @@
+#! /bin/bash
+
+
+case "$1" in
+	5) FSLDIR=/usr/local/fsl
+
+		. ${FSLDIR}/etc/fslconf/fsl.sh
+#		PATH=/usr/prog/bin:/usr/prog/script_shell:/usr/local/bin:${FSLDIR}/bin:/usr/bin:/bin
+		export FSLDIR
+		PATH=${FSLDIR}/bin:${PATH}
+		FSL_VER="5"
+		;;
+	4) FSLDIR=/usr/local/fsl
+		. ${FSLDIR}/etc/fslconf/fsl.sh
+#		PATH=/usr/prog/bin:/usr/prog/script_shell:/usr/local/bin:${FSLDIR}/bin:/usr/bin:/bin
+		export FSLDIR
+		PATH=${FSLDIR}/bin:${PATH}
+		FSL_VER="5"
+		;;
+		 
+#		FSLDIR=/usr/local/fsl
+#		. ${FSLDIR}/etc/fslconf/fsl.sh
+#		PATH=/usr/prog/bin:/usr/prog/script_shell:/usr/local/bin:${FSLDIR}/bin:/usr/bin:/bin
+#		export FSLDIR
+#		PATH=${FSLDIR}/bin:${PATH}
+#		FSL_VER="4"		
+#		;;
+	*) echo
+		echo "Unknown Parameters" 
+		echo
+		echo "Usage: . use_fsl *version*"
+		echo
+		echo "presently only version 5.0.9 is installed"
+		echo
+		;;
+esac
+
+
+

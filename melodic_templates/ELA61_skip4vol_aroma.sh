@@ -1,0 +1,10 @@
+template_name=ELA61_skip4vol_aroma
+TEMPLATE_MELODIC_IC=/media/data/MRI/projects/ELA/group_analysis/melodic/group_templates/ELA61_skip4vol_aroma/melodic_IC.nii.gz
+TEMPLATE_MASK_IMAGE=/media/data/MRI/projects/ELA/group_analysis/melodic/group_templates/ELA61_skip4vol_aroma/mask.nii.gz
+TEMPLATE_BG_IMAGE=/media/data/MRI/projects/ELA/group_analysis/melodic/group_templates/ELA61_skip4vol_aroma/bg_image.nii.gz
+TEMPLATE_STATS_FOLDER=/media/data/MRI/projects/ELA/group_analysis/melodic/group_templates/ELA61_skip4vol_aroma/stats
+TEMPLATE_MASK_FOLDER=/media/data/MRI/projects/ELA/group_analysis/melodic/group_templates/ELA61_skip4vol_aroma/stats
+str_pruning_ic_id=() # valid RSN: you must set their id values removing 1: if in the html is the 6th RSN, you must write 5!!!!!!
+str_arr_IC_labels=()
+declare -a arr_IC_labels=()
+declare -a arr_pruning_ic_id=()

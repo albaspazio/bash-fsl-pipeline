@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#author: Sebastiano Galantucci
+
+#usa contrast corrector a 300
+
+#threshold options: 100, 200, 300, 400, 500
+
+while getopts ":t:s:l:" flag; do
+   case $flag in
+
+ t) thresh=$OPTARG
+ ;;
+ s) scan=$OPTARG
+ ;;
+ l) list=$OPTARG
+ ;;
+     esac
+done
+
+
+work_dir=`pwd`
+ . use_fs 5.3
+
+# starts from freesurfer folder. E.g. /snap/home2/dati/BELGRADO_1.5Philips/PD-Demenze/group_analysis/Freesurfer_prova
+
+SUBJECTS_DIR=`pwd`
+export SUBJECTS_DIR
+
+
+#list=`ls -d PD_HY1_davidovic_milorad_s1`
+
+
+for subj in $list
+
+do
+
+echo $subj
+cd ${subj}_${scan}/mri
+echo
+### da attivare per usare contrast corrector
+
+#matlab7.6 < /gnappo/home/dati/Seb/scripts/matlab/Contrast_Corrector_launcher.m; mkdir tmp; mv m3DT1_Thre*.nii tmp; cd tmp; ; mv m3DT1_Thre${thresh}.nii $work_dir/$subj/mri ;cd $work_dir/$subj/mri;'rm' -r tmp
+
+#####
+
+if [ -f ./001.mgz ]
+then
+    'rm' 001.mgz
+else
+		echo 
+fi
+
+#mri_convert m3DT1_Thre${thresh}.nii 001.mgz 
+
+if [ -f ./m3DT1.nii.gz ]
+then
+		gunzip m3DT1.nii.gz
+else
+		echo
+fi
+mri_convert m3DT1.nii 001.mgz 
+cd $work_dir
+
+recon-all -s ${subj}_${scan} -all
+
+#per visualizzare le superfici ottenute: tkmedit adamovic_branislava_s1 brainmask.mgz -surfs
+
+
+
+cd $work_dir
+
+done

@@ -1,0 +1,121 @@
+#!/bin/bash
+
+#author: Sebastiano Galantucci
+
+usage="type: connectome_dti35_e -s [SCAN folder] -m [MATRICES folder] -l [SUBJECT LIST]"
+
+
+while getopts ":h:s:l:m:" flag; do
+case $flag in
+h) echo $usage
+       exit
+       ;;
+s) scan=$OPTARG
+;;
+m) matrices_dir=$OPTARG
+;;
+l) list=$OPTARG
+;;
+esac
+done
+work_dir=`pwd`
+for subj in $list
+do
+echo $subj
+
+cd $work_dir/$subj/$scan/dti
+
+bin=/gnappo/home/dati/Seb/scripts/trackvis_bin
+
+
+if [ -d ./$trackvis_dir ]
+	then
+		echo
+	else
+		mkdir $trackvis_dir
+fi
+'cp' bvals* bvecs* $work_dir/$subj/$scan/dti/$trackvis_dir
+cd $trackvis_dir
+
+
+gunzip -f bvecs* bvals*
+
+awk -f /gnappo/home/dati/Seb/scripts/transpose_seb_dti32.awk bvecs > bvec_vert.txt
+
+if [ -f ./dti.trk ]
+then
+echo dtk tractography already performed
+else
+mkdir tmp
+$bin/dti_recon "../dw_aligned.nii.gz" "dti" -gm "bvec_vert.txt" -b 1000 -b0 1 -p 3 -sn 1 -ot nii 
+$bin/dti_tracker "dti" "tmp/track_tmp.trk" -at 45 -iz -m "dti_fa.nii" 0.15 1 -m2 "../nodif_brain_mask.nii" -fact -it nii 
+$bin/spline_filter "tmp/track_tmp.trk" 1 "dti.trk"
+'rm' -r tmp
+gzip -f *nii*
+fslmaths dti_e2 -add dti_e3 dti_e23; fslmaths dti_e23 -div 2 dti_e23
+fi
+cd $work_dir/$subj/$scan/mpr/mpr_conn_aal/reg
+if [ -f ./raal_kmeans_250_262_nl_nn_91x109x91_2_nodif_nl_gm_262.nii.gz ]
+then
+echo;echo 262 areas already calculated
+else
+area=raal_kmeans_250_262_nl_nn_91x109x91_2_nodif_nl_gm; count=262; for i in `seq -w $count`; do echo $i; fslmaths $area -thr $i ${area}_${i}; fslmaths ${area}_${i} -uthr $i ${area}_${i}; done
+fi
+cd $work_dir/$subj/$scan/dti/TV/
+fslmaths dti_e2 -add dti_e3 dti_e23; fslmaths dti_e23 -div 2 dti_e23
+
+if [ -d ./$matrices_dir ]
+then
+echo matrices_dir ok
+else
+mkdir $matrices_dir
+fi
+cd $matrices_dir
+if [ -f ./fa_AM.mat ]
+then 
+echo trackvis matrices already calculated
+else
+area=raal_kmeans_250_262_nl_nn_91x109x91_2_nodif_nl_gm
+count=262
+for i in `seq -w $count`; do
+echo $i
+jj=1
+for j in `seq -w $count`; do 
+res[jj]=`/gnappo/home/dati/Seb/scripts/trackvis_bin/track_vis $work_dir/$subj/$scan/dti/TV/dti.trk -roi $work_dir/$subj/$scan/mpr/mpr_conn_aal/reg/${area}_${i}.nii.gz -roi2 $work_dir/$subj/$scan/mpr/mpr_conn_aal/reg/${area}_${j}.nii.gz -o currTract.trk -ov currTract.img -nr | grep "Number of tracks to render" | awk '{printf($6)}'`
+if [ ${res[jj]} -gt 0 ]
+then
+fa[jj]=`fslstats $work_dir/$subj/$scan/dti/TV/dti_fa -k currTract -M` 
+else
+fa[jj]=NaN  
+fi
+if [ ${res[jj]} -gt 0 ]
+then
+md[jj]=`fslstats $work_dir/$subj/$scan/dti/TV/dti_adc -k currTract -M` 
+else
+md[jj]=NaN  
+fi
+if [ ${res[jj]} -gt 0 ]
+then
+axd[jj]=`fslstats $work_dir/$subj/$scan/dti/TV/dti_e1 -k currTract -M` 
+else
+axd[jj]=NaN  
+fi
+if [ ${res[jj]} -gt 0 ]
+then
+radd[jj]=`fslstats $work_dir/$subj/$scan/dti/TV/dti_e23 -k currTract -M` 
+else
+radd[jj]=NaN
+fi
+imrm currTract
+'rm' currTract.trk
+jj=`expr $jj + 1`
+done 
+echo ${res[*]} >> AM.mat
+echo ${fa[*]} >> fa_AM.mat
+echo ${md[*]} >> md_AM.mat
+echo ${axd[*]} >> axd_AM.mat
+echo ${radd[*]} >> radd_AM.mat
+done
+fi
+cd $work_dir
+done

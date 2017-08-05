@@ -1,0 +1,10 @@
+template_name=subjects77_melodic_T77
+TEMPLATE_MELODIC_IC=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects77_melodic_T77/melodic_IC.nii.gz
+TEMPLATE_MASK_IMAGE=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects77_melodic_T77/mask.nii.gz
+TEMPLATE_BG_IMAGE=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects77_melodic_T77/bg_image.nii.gz
+TEMPLATE_STATS_FOLDER=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects77_melodic_T77/stats
+TEMPLATE_MASK_FOLDER=/media/dados/MRI/projects/temperamento_murcia/group_analysis/melodic/group_templates/subjects77_melodic_T77/stats
+str_pruning_ic_id="1,2,3,4,5,6,7,8,9,11,12,15,18,19,20,23,24,25,28,34" # valid RSN: you must set their id values removing 1: if in the html is the 6th RSN, you must write 5!!!!!!
+str_arr_IC_labels="OCCIP,pDMN2,pDMN,SM,aDMN,OCCIP2,aDMN2,LATN,LAT_V1,LAT_V1a,DORSAL,RATN,EXEC_ANTSAL,LATN2,RVENTRAL,BFP,LVENTRAL,BVENTRAL,BDORSAL,SM2"
+declare -a arr_IC_labels=(OCCIP pDMN2 pDMN SM aDMN OCCIP2 aDMN2 LATN LAT_V1 LAT_V1a DORSAL RATN EXEC_ANTSAL LATN2 RVENTRAL BFP LVENTRAL BVENTRAL BDORSAL SM2)
+declare -a arr_pruning_ic_id=(1 2 3 4 5 6 7 8 9 11 12 15 18 19 20 23 24 25 28 34)

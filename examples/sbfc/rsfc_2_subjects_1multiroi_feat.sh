@@ -1,0 +1,55 @@
+#!/bin/bash
+
+WORK_IN_CAB=0
+# ====== init params ===========================
+if [ $WORK_IN_CAB -eq 0 ]
+then
+	GLOBAL_SCRIPT_DIR=/media/data/MRI/scripts
+	PROJ_DIR=/media/data/MRI/projects/CAB/fsl_belgrade_early_pd 					# <<<<@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	export FSLDIR=/usr/local/fsl																# change according to used PC
+else
+	GLOBAL_SCRIPT_DIR=/homer/home/dati/fsl_global_scripts
+	PROJ_DIR=/media/Iomega_HDD/MRI/projects/CAB/fsl_belgrade_early_pd		# <<<<@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+	export FSLDIR=/usr/share/fsl/4.1														# change according to used PC	
+fi
+
+#===============================================
+. $GLOBAL_SCRIPT_DIR/init_vars.sh $PROJ_DIR
+#===============================================
+SESS_ID=1
+NUM_CPU=2
+EXECUTE_SH=$GLOBAL_SCRIPT_DIR/process_subject/subject_epi_sbfc_1multiroi_feat.sh
+
+# base name of ROI: final name used by the script will be $ROI_DIR/reg_epi/mask_ROINAME_epi.nii.gz
+declare -a arr_roi=(l_caudate_hos_fsl l_pallidum_hos_fsl l_putamen_hos_fsl l_thalamus_hos_fsl)
+
+TEMPL_FSF=$PROJ_SCRIPT_DIR/glm/templates/template_feat_4roi_ortho
+
+# standard call: define output dir name
+OUTPUT_DIR_NAME=roi_left_caud_pall_put_thal_ortho
+INPUT_ROI_DIR="reg_epi"
+
+# alternative call: define output dir name, input file name and output series postfix name
+OUTPUT_SERIES_POSTFIX_NAME="denoised"
+ALTERNATIVE_OUTPUT_DIR_NAME=roi_left_caud_pall_put_thal_ortho_denoised
+ALTERNATIVE_INPUT_NUISANCE_FILE="nuisance_denoised_10000.nii.gz"
+ALTERNATIVE_INPUT_ROI_DIR="reg_epi"
+OUTPUT_SERIES_POSTFIX_NAME="denoised"
+#====================================================================================
+declare -a final_roi=()
+declare -i cnt=0
+
+for roi in ${arr_roi[@]}; do
+	final_roi[cnt]=mask_$roi"_epi.nii.gz"
+	cnt=$cnt+1 
+done	
+
+# default call: read $RSFC_DIR/nuisance_10000.nii.gz
+. $MULTICORE_SCRIPT_DIR/define_thread_processes.sh $NUM_CPU $EXECUTE_SH "$arr_subj" $PROJ_DIR -model $TEMPL_FSF -odn $OUTPUT_DIR_NAME -ridn $INPUT_ROI_DIR ${final_roi[@]} 
+# default call: read $RSFC_DIR/nuisance_denoised_10000.nii.gz
+. $MULTICORE_SCRIPT_DIR/define_thread_processes.sh $NUM_CPU $EXECUTE_SH "$arr_subj" $PROJ_DIR -ifn $ALTERNATIVE_INPUT_NUISANCE_FILE -model $TEMPL_FSF -odn $ALTERNATIVE_OUTPUT_DIR_NAME -son $OUTPUT_SERIES_POSTFIX_NAME -ridn $ALTERNATIVE_INPUT_ROI_DIR ${final_roi[@]} 
+wait	
+
+
+echo "=====================> finished processing $0"
+
