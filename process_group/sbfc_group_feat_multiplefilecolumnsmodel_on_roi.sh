@@ -6,10 +6,9 @@ Usage() {
     
 usage:	. $GLOBAL_GROUP_SCRIPT_DIR/sbfc_group_feat_multiplefilecolumnsmodel_on_roi.sh  path_to_fsf   /media/data/MRI/projects/colegios -odp output_dir_root_path -ncope num_copes -isubjf input_subject_variable_file_path 1stlevel_feat_dirs
 
-
-what it does: do sbfc group analysis. you can provide a file containing several columns with various variables. 
-							you can select which of them are covariate (having the corresponding contrasts) or nuisance variables (no contrasts associated)
-							if you don't provide a subject file, it will create a group comparison stat model..but needs the -groupslastids input parameter
+what it does: 	do sbfc group analysis. you can provide a file containing several columns with various variables. 
+				you can select which of them are covariate (having the corresponding contrasts) or nuisance variables (no contrasts associated)
+				if you don't provide a subject file, it will create a group comparison stat model..but needs the -groupslastids input parameter
 
 input:
 1             	columnsids		 "c1,c2,c3|n1,n2,n3" | separated string....left side are covariates, right side are nuisance
@@ -19,8 +18,8 @@ input:
 -model        	path to fsf model
 -isubjf       	input subject file
 -groupslastids	groupslastids   comma-separated string contaning the ID of the last subject of each group. eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
--stdimg 		  	standard or study template
-$X,$Y,$Z		  	input 1stlevel feat full path : contains the single subject feat folder for a specific roi(s)
+-stdimg 		standard or study template
+$X,$Y,$Z		input 1stlevel feat full path : contains the single subject feat folder for a specific roi(s)
 
 output:
 outputdir		output root dir/feat_ 1stlevel_feat_name _ fsfname	  
@@ -42,10 +41,10 @@ fi
 #--------------------------------------------
 OUTPUT_ROOT_DIR=$PROJ_GROUP_ANALYSIS_DIR/sbfc
 SUBJECT_VARIABLE_FILE=""
-groupslastids=""					# comma-separated string contaning the ID of the last subject of each group.
-													# eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
+groupslastids=""			# comma-separated string contaning the ID of the last subject of each group.
+							# eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
 declare -i NUM_GROUPS=1 	# derived from groupslastids, store the number of groups in the design. each group will have its regressor (EV). 
- 													# covariates/nuisance regressors will be appended starting from the (NUM_GROUPS+1)th column_id													
+ 							# covariates/nuisance regressors will be appended starting from the (NUM_GROUPS+1)th column_id													
 multiple_groups_string=""	# string to be passed to create_Ncov_Xnuisance_glm_file that contain the -groupslastids option
 DOUBLE_MEAN_CONTRASTS=""	# to be passed to create_Ncov_Xnuisance_glm_file: if 1, create a -1 contrast for each 1 contrast of the mean.
 ROI_FEAT_FOLDER_NAME=""
@@ -57,38 +56,38 @@ while [ ! -z "$1" ]
 do
   case "$1" in
   
-  		-model)						TEMPLATE_GLM_FSF=$2
-  											shift;;
+  	-model)			TEMPLATE_GLM_FSF=$2
+  					shift;;
   		
-      -ncope) 					NUM_COPES=$2
-      									shift;;
+    -ncope) 		NUM_COPES=$2
+      				shift;;
       					
-      -odp) 						OUTPUT_ROOT_DIR=$2
-												shift;;
+    -odp) 			OUTPUT_ROOT_DIR=$2
+					shift;;
 												
-			-odn)							ROI_FEAT_FOLDER_NAME=$2
-												shift;;
+	-odn)			ROI_FEAT_FOLDER_NAME=$2
+					shift;;
 								
-			-isubjf)					SUBJECT_VARIABLE_FILE=$2
-												shift;;
+	-isubjf)		SUBJECT_VARIABLE_FILE=$2
+					shift;;
 										
-			-groupslastids)		groupslastids=$2
-												shift;;							
+	-groupslastids)	groupslastids=$2
+					shift;;							
 												
-			-dblcon)					DOUBLE_MEAN_CONTRASTS=$2
-												shift;;			
+	-dblcon)		DOUBLE_MEAN_CONTRASTS=$2
+					shift;;			
 			
-      -stdimg) 					STANDARD_IMAGE=$2
-      									if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
-												shift;;		
+    -stdimg) 		STANDARD_IMAGE=$2
+      				if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
+					shift;;		
 			
-      -maskimg)					MASK_IMAGE=$2
-      									if [ `$FSLDIR/bin/imtest $MASK_IMAGE` = 0 ]; then echo "mask image ($MASK_IMAGE) specified but non present....exiting "; exit; fi
-												shift;;													
+    -maskimg)		MASK_IMAGE=$2
+      				if [ `$FSLDIR/bin/imtest $MASK_IMAGE` = 0 ]; then echo "mask image ($MASK_IMAGE) specified but non present....exiting "; exit; fi
+					shift;;													
 			
-			-nofeat)					DO_FEAT=0;;
+	-nofeat)		DO_FEAT=0;;
 															
-      *) 								break;;
+      *) 			break;;
   esac
   shift
 done

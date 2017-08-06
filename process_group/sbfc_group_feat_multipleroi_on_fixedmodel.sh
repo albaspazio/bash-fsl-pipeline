@@ -6,6 +6,8 @@ Usage() {
     
 usage:	. $GLOBAL_GROUP_SCRIPT_DIR/sbfc_group_feat_multipleroi_on_fixedmodel.sh  feat_folder_name   /media/data/MRI/projects/colegios  -odp output_dir_root_path -ncope num_copes -model path_to_fsf 1stlevel_feat_root_dirs
 
+what it does: do sbfc group analysis. it accepts one 1st level folder name, it appends num_copes, output_dir_root_path, regstandard, feat_file
+
 input:
 1       		1st level feat folder name		 
 2       		proj_dir	
@@ -13,7 +15,7 @@ input:
 -ncope  		num copes
 -model  		path to fsf model
 -stdimg 		standard or study template
-$X,$Y,$Z		input 1stlevel feat root path : contains single-subject feat root folder of several roi(s) analysis
+$X,$Y,$Z		input 1stlevel feat root path : contains single-subject feat ROOT folder of several roi(s) analysis
 
 EOF
     exit 1
@@ -32,24 +34,23 @@ while [ ! -z "$1" ]
 do
   case "$1" in
   
-  		-model) 	FSF_TEMPLATE=$2
-  							shift;;
+  	-model) 	FSF_TEMPLATE=$2
+  				shift;;
   								
-      -ncope) 	NUM_COPES=$2
-      					shift;;
+    -ncope) 	NUM_COPES=$2
+    			shift;;
       						
-      -odp) 		OUTPUT_ROOT_DIR=$2
-								shift;;
+    -odp) 		OUTPUT_ROOT_DIR=$2
+				shift;;
 									
-      -stdimg) 	STANDARD_IMAGE=$2
-      					if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit
-								shift;;					
+    -stdimg) 	STANDARD_IMAGE=$2
+    			if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
+				shift;;					
 									
-      *) 				break;;
+    *) 			break;;
   esac
   shift
 done
-
 
 #--------------------------------------------------------------------------------------------------------------------------
 # remaining parameters are 1st_level_FEAT_SOURCEs...check them !

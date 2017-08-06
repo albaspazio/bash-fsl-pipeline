@@ -6,6 +6,8 @@ Usage() {
     
 usage:	. $GLOBAL_GROUP_SCRIPT_DIR/sbfc_group_feat_multiplefixedmodel_on_roi.sh  path_to_fsf   /media/data/MRI/projects/colegios  -odp output_dir_root_path -ncope num_copes 1stlevel_feat_dirs
 
+what it does: 	do sbfc group analysis. it accepts one template fsf, it appends num_copes, output_dir_root_path, regstandard, feat_files
+
 input:
 1       		fsf model		 
 2       		proj_dir	
@@ -16,6 +18,7 @@ $X,$Y,$Z		input 1stlevel feat full path : contains the single subject feat folde
 
 output:
 outputdir		output root dir/feat_ 1stlevel_feat_name _ fsfname	  
+
 EOF
     exit 1
 }
@@ -35,16 +38,16 @@ do
   case "$1" in
   
       -ncope) 	NUM_COPES=$2
-      					shift;;
+      			shift;;
       						
-      -odp) 		OUTPUT_ROOT_DIR=$2
-								shift;;
+      -odp) 	OUTPUT_ROOT_DIR=$2
+				shift;;
 									
       -stdimg) 	STANDARD_IMAGE=$2
-      					if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit
-								shift;;					
+      			if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit;fi
+				shift;;					
 									
-      *) 				break;;
+      *)		break;;
   esac
   shift
 done
