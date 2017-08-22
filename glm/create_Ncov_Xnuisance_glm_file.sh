@@ -24,55 +24,47 @@ PROJ_DIR=$1; shift
 
 OUTPUT_ROOT_FILE_NAME=mult_cov
 INPUT_TEMPL_GLM_FSF=""		# /home/...../proj_label/script/glm/.....fsf
-SUBJECTS_FILE=""					# ..../colegios_dat_21subj.txt : file containing tab separated subject data
-NUISANCE_COLUMNS=""				# comma separated columns ID. column of interest:  according to a 1-based array !!! so add -1 to adjust to 0-based arrays
-COVARIATE_COLUMNS=""			# column of interest:  according to a 1-based array !!! so add -1 to adjust to 0-based arrays 
-CREATE_MODEL=1 						#	if 1 call feat_model at the end to create .mat/.con file for randomise analysis...if 0 no..to be used for Feat analysis
-RND_NAME=""								# string to be appended to output GLM files, useful when you create several design simultaneously
-REGR_COMP=0								# if 1: create also covariate comparison contrast: e.g.  [0  1 -1], [0 -1  1]
-GROUPSLASTSIDS=""					# comma-separated string contaning the ID of the last subject of each group.
-													# eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
-NUM_MEAN_CONTRASTS=1 			# manage the creation of the mean contrast (valid when NUM_COVS>0)													
+SUBJECTS_FILE=""			# ..../colegios_dat_21subj.txt : file containing tab separated subject data
+NUISANCE_COLUMNS=""			# comma separated columns ID. column of interest:  according to a 1-based array !!! so add -1 to adjust to 0-based arrays
+COVARIATE_COLUMNS=""		# column of interest:  according to a 1-based array !!! so add -1 to adjust to 0-based arrays 
+CREATE_MODEL=1 				#	if 1 call feat_model at the end to create .mat/.con file for randomise analysis...if 0 no..to be used for Feat analysis
+RND_NAME=""					# string to be appended to output GLM files, useful when you create several design simultaneously
+REGR_COMP=0					# if 1: create also covariate comparison contrast: e.g.  [0  1 -1], [0 -1  1]
+GROUPSLASTSIDS=""			# comma-separated string contaning the ID of the last subject of each group.
+							# eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
+NUM_MEAN_CONTRASTS=1 		# manage the creation of the mean contrast (valid when NUM_COVS>0)													
 declare -i NUM_GROUPS=1 	# manage the number of groups in the design. each group will have its regressor (EV). 
- 													# covariates/nuisance regressors will be appended starting from the (NUM_GROUPS+1)th column_id
+ 							# covariates/nuisance regressors will be appended starting from the (NUM_GROUPS+1)th column_id
 
 while [ ! -z "$1" ]
 do
   case "$1" in
   
-  		-model)						INPUT_TEMPL_GLM_FSF=$2;
-  											shift;;
+  	-model)						INPUT_TEMPL_GLM_FSF=$2;shift;;
   							
-      -odp) 						OUTPUT_ROOT_DIR=$2
-												shift;;
+    -odp) 						OUTPUT_ROOT_DIR=$2;shift;;
 												
-      -ofn) 						OUTPUT_ROOT_FILE_NAME=$2
-												shift;;												
+    -ofn) 						OUTPUT_ROOT_FILE_NAME=$2;shift;;												
 								
-			-isubjf)					SUBJECTS_FILE=$2
-												shift;;
+	-isubjf)					SUBJECTS_FILE=$2;shift;;
 								
-			-groupslastids)		GROUPSLASTSIDS=$2
-												shift;;	
-																	
-			-nuisids)					NUISANCE_COLUMNS=$2
-												shift;;									
-			
-			-covids)					COVARIATE_COLUMNS=$2
-												shift;;	
+	-groupslastids)		        GROUPSLASTSIDS=$2;shift;;	
+																
+	-nuisids)					NUISANCE_COLUMNS=$2;shift;;									
+		
+	-covids)					COVARIATE_COLUMNS=$2;shift;;	
 												
-			-rndname) 				RND_NAME=$2
-												shift;;	
+	-rndname) 					RND_NAME=$2;shift;;	
 								
-			-dblcon)					NUM_MEAN_CONTRASTS=2;;
+	-dblcon)					NUM_MEAN_CONTRASTS=2;;
 
-			-skipmean)				NUM_MEAN_CONTRASTS=0;;
+	-skipmean)					NUM_MEAN_CONTRASTS=0;;
 
-			-nomodel)					CREATE_MODEL=0;;
+	-nomodel)					CREATE_MODEL=0;;
 								
-			-regrcomp) 				REGR_COMP=1;;
+	-regrcomp) 					REGR_COMP=1;;
 								
-      *) break;;
+    *) break;;
   esac
   shift
 done
@@ -159,72 +151,70 @@ do
   # len=$len-1;  line=${line[@]:0:len}  # remove last character (/r)
   
   # extract label from FIRST LINE
-  if [ $cnt -eq 0 ]; then
-    cnt=1
-    declare -i len=${#line}-1; last_ch=${line[@]:len:1};
-    # get columns labels, define OUT DIR, fsf file name and fill columns labels array
-    # first covariates then nuisance values
-    ARR_LABELS=( $line )
-    OUT_FSF_NAME=$OUTPUT_ROOT_FILE_NAME
-    if [ $NUM_COVS -gt 0 ]; then
-		  for cov_id in ${ARR_COVARIATE_COLUMNS[@]}
-		  do
-		    cov_label=${ARR_LABELS[cov_id-1]}      
-		    OUT_FSF_NAME=$OUT_FSF_NAME"_"$cov_label
-#			  echo ---$OUT_FSF_NAME --- $cov_label
- 		    ARR_USED_COV_LABELS[ncov]=$cov_label		# fill columns labels array
-		    ncov=$ncov+1
-		  done
+	if [ $cnt -eq 0 ]; then
+    	cnt=1
+    	declare -i len=${#line}-1; last_ch=${line[@]:len:1};
+    	# get columns labels, define OUT DIR, fsf file name and fill columns labels array
+    	# first covariates then nuisance values
+		ARR_LABELS=( $line )
+		OUT_FSF_NAME=$OUTPUT_ROOT_FILE_NAME
+    	if [ $NUM_COVS -gt 0 ]; then
+			for cov_id in ${ARR_COVARIATE_COLUMNS[@]}
+		  	do
+		    	cov_label=${ARR_LABELS[cov_id-1]}      
+		    	OUT_FSF_NAME=$OUT_FSF_NAME"_"$cov_label
+				#echo ---$OUT_FSF_NAME --- $cov_label
+ 			    ARR_USED_COV_LABELS[ncov]=$cov_label		# fill columns labels array
+			    ncov=$ncov+1
+		  	done
 		fi
-#		echo OUT_FSF_NAME $OUT_FSF_NAME
-    if [ $NUM_NUIS -gt 0 ]; then
-		  OUT_FSF_NAME=$OUT_FSF_NAME"_x"
-		  ncov=0
-#		  echo $NUM_NUIS :: ${ARR_NUISANCE_COLUMNS[@]}    
+		#echo OUT_FSF_NAME $OUT_FSF_NAME
+    	if [ $NUM_NUIS -gt 0 ]; then
+			OUT_FSF_NAME=$OUT_FSF_NAME"_x"
+		  	ncov=0
+#		  	echo $NUM_NUIS :: ${ARR_NUISANCE_COLUMNS[@]}    
     
-		  for cov_id in ${ARR_NUISANCE_COLUMNS[@]}
-		  do
-		    cov_label=${ARR_LABELS[cov_id-1]}      
-		    OUT_FSF_NAME=$OUT_FSF_NAME"_"$cov_label
-		    ARR_USED_NUIS_LABELS[ncov]=$cov_label		# fill columns labels array
-		    ncov=$ncov+1
-		  done
+		  	for cov_id in ${ARR_NUISANCE_COLUMNS[@]}
+		  	do
+		    	cov_label=${ARR_LABELS[cov_id-1]}      
+		    	OUT_FSF_NAME=$OUT_FSF_NAME"_"$cov_label
+		    	ARR_USED_NUIS_LABELS[ncov]=$cov_label		# fill columns labels array
+		    	ncov=$ncov+1
+		  	done
 		fi
 		
-    OUTPUT_GLM_FSF=$OUTPUT_ROOT_DIR/$OUT_FSF_NAME$RND_NAME.fsf
-    
-    [[ $INPUT_TEMPL_GLM_FSF != $OUTPUT_GLM_FSF ]] && cp $INPUT_TEMPL_GLM_FSF $OUTPUT_GLM_FSF
-    continue
-  fi
+    	OUTPUT_GLM_FSF=$OUTPUT_ROOT_DIR/$OUT_FSF_NAME$RND_NAME
+    	continue
+ 	fi
 
-  # get columns: first nuisance than covariate
-  subj=`echo $line | awk '{print $1}'`
+  	# get columns: first nuisance than covariate
+  	subj=`echo $line | awk '{print $1}'`
   
-  if [ -z $subj ]; then continue; fi;
+  	if [ -z $subj ]; then continue; fi;
   
-  ARR_SUBJECTS[$NUM_SUBJ]=$subj 
-  declare -i curr_cov=0
-  for column_id in ${ARR_NUISANCE_COLUMNS[@]}
-  do
-    cov_val=`echo $line | awk '{print $'$column_id'}'`;
-    declare -i arr_id=$NUM_SUBJ*$NUM_NUIS+$curr_cov   # echo "arr_id: "$arr_id
-    ARR_NUIS[$arr_id]=$cov_val
-    curr_cov=$curr_cov+1
-  done
+  	ARR_SUBJECTS[$NUM_SUBJ]=$subj 
+  	declare -i curr_cov=0
+  	for column_id in ${ARR_NUISANCE_COLUMNS[@]}
+  	do
+    	cov_val=`echo $line | awk '{print $'$column_id'}'`;
+    	declare -i arr_id=$NUM_SUBJ*$NUM_NUIS+$curr_cov   # echo "arr_id: "$arr_id
+    	ARR_NUIS[$arr_id]=$cov_val
+    	curr_cov=$curr_cov+1
+  	done
 
-  declare -i curr_cov=0
-  for column_id in ${ARR_COVARIATE_COLUMNS[@]}
-  do
-    cov_val=`echo $line | awk '{print $'$column_id'}'`;
-    declare -i arr_id=$NUM_SUBJ*$NUM_COVS+$curr_cov   # echo "arr_id: "$arr_id
-    ARR_COV[$arr_id]=$cov_val
-    curr_cov=$curr_cov+1
-  done
-  NUM_SUBJ=$NUM_SUBJ+1
+  	declare -i curr_cov=0
+  	for column_id in ${ARR_COVARIATE_COLUMNS[@]}
+  	do
+    	cov_val=`echo $line | awk '{print $'$column_id'}'`;
+    	declare -i arr_id=$NUM_SUBJ*$NUM_COVS+$curr_cov   # echo "arr_id: "$arr_id
+    	ARR_COV[$arr_id]=$cov_val
+    	curr_cov=$curr_cov+1
+  	done
+  	NUM_SUBJ=$NUM_SUBJ+1
 done < $SUBJECTS_FILE
 #---------------------------------------------------------------------------------------------------------------------
 # check num groups input params
-
+grp_str=""
 if [ -z $GROUPSLASTSIDS ]; then 
 	ARR_GROUPS_LASTS[0]=$NUM_SUBJ
 else
@@ -233,11 +223,18 @@ else
 	ARR_GROUPS_LASTS=( $GROUPSLASTSIDS );
 	IFS=$OLD_IFS	
 	NUM_GROUPS=${#ARR_GROUPS_LASTS[@]}
+	grp_str="_"$NUM_GROUPS"groups"
 fi
 
+#---------------------------------------------------------------------------------------------------------------------
+# define OUTPUT_GLM_FSF name
+#---------------------------------------------------------------------------------------------------------------------
+OUTPUT_GLM_FSF=${OUTPUT_GLM_FSF}${grp_str}.fsf
+[[ $INPUT_TEMPL_GLM_FSF != $OUTPUT_GLM_FSF ]] && cp $INPUT_TEMPL_GLM_FSF $OUTPUT_GLM_FSF
 
 
 
+#---------------------------------------------------------------------------------------------------------------------
 declare -i tot_EV=0
 declare -i tot_cont=2
 
@@ -470,7 +467,6 @@ do
 	done
 done
 
-
 declare -i firstsubjofgroup=0
 declare -i lastsubjofgroup=0
 
@@ -582,13 +578,7 @@ else   # NUM_GROUPS > 1
 				echo "set fmri(con_real$contr_id.$ev_id) -1" >> $OUTPUT_GLM_FSF				
 				echo "set fmri(con_real$contr_id.$ev_id_plus1) 1" >> $OUTPUT_GLM_FSF				
 			fi
-			
-			
-			
 		done
-
-
-
 
 	else # $NUM_COVS = 0, MEAN_CONTRASTS = 1 or 2
 
@@ -626,7 +616,20 @@ else   # NUM_GROUPS > 1
 		fi
 	fi
 fi
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #if [ $MEAN_CONTRASTS -gt 0 ]; then  
 #	# NO COVARIATES, just group means & comparisons
 #	if [ $NUM_GROUPS -eq 1 ]; then

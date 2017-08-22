@@ -1,3 +1,5 @@
+#!/bin/bash
+
 usage_string="ERROR: usage=> $0 SUBJ_LABEL PROJ_DIR -i input_merged_dir_name -o output_dir_name -m mask_file_path -e seed_file_name -s stop_file_name -t target_text_file <waypoint file name>"
 
 
@@ -97,7 +99,7 @@ if [ ! -z $TARGET_FILE ]; then run $FSLDIR/bin/find_the_biggest $PROBTRACKX_DIR/
 
 
 # normalize fdt_paths
-run w=$(cat $PROBTRACKX_DIR/$OUTPUT_DIR_NAME/waytotal | tr -d ' ')  # read value and remove space chars
+w=$(cat $PROBTRACKX_DIR/$OUTPUT_DIR_NAME/waytotal | tr -d ' ')  # read value and remove space chars
 if [ $w -eq 0 ]; then run echo "$SUBJ_NAME: Error in probtracks, waypoint=0"
 else	run $FSLDIR/bin/fslmaths $PROBTRACKX_DIR/$OUTPUT_DIR_NAME/fdt_paths.nii.gz -div $w $PROBTRACKX_DIR/$OUTPUT_DIR_NAME/fdt_paths_norm.nii.gz; 
 fi

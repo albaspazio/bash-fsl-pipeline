@@ -1,5 +1,5 @@
 # I can filter according to:
-# the sub-analysis initials  (e.g. analysisdir/RSNX/---->>>Fear_x_age<-------/...images....)
+# the sub-analysis wildcard  (e.g. analysisdir/RSNX/---->>>Fear_x_age<-------/...images....)
 # the stat image  (e.g. analysisdir/RSNX/Fear_x_age/*image_root_name*)
 
 

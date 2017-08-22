@@ -4,7 +4,8 @@
 Usage() {
     cat <<EOF
     
-usage:	. $GLOBAL_GROUP_SCRIPT_DIR/sbfc_group_feat_multiplefilecolumnsmodel_on_roi.sh  path_to_fsf   /media/data/MRI/projects/colegios -odp output_dir_root_path -ncope num_copes -isubjf input_subject_variable_file_path 1stlevel_feat_dirs
+usage:	. $GLOBAL_GROUP_SCRIPT_DIR/sbfc_group_feat_multiplefilecolumnsmodel_on_roi.sh "1|3,4" /media/data/MRI/projects/XXXX 
+								-odp output_dir_root_path -ncope num_copes -model path/2/fsf/file -isubjf input_subject_variable_file_path -groupslastids "18,38,52" -stdimg  /path/2/alternative/stdimg 1stlevel_feat_dirs
 
 what it does: 	do sbfc group analysis. you can provide a file containing several columns with various variables. 
 				you can select which of them are covariate (having the corresponding contrasts) or nuisance variables (no contrasts associated)
@@ -18,18 +19,19 @@ input:
 -model        	path to fsf model
 -isubjf       	input subject file
 -groupslastids	groupslastids   comma-separated string contaning the ID of the last subject of each group. eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group
--stdimg 		standard or study template
-$X,$Y,$Z		input 1stlevel feat full path : contains the single subject feat folder for a specific roi(s)
+-stdimg 				standard or study template
+-nofeat					does not start feat
+$X,$Y,$Z				1stlevel feat full path : contains the single subject feat folder for a specific roi(s)
 
 output:
-outputdir		output root dir/feat_ 1stlevel_feat_name _ fsfname	  
+outputdir		output root dir/feat_ 1stlevel_feat_name _ fsfname		  
 EOF
     exit 1
 }
 
 [ $# -lt 3 ] && Usage
 
-echo $@
+# echo $@
 # ====== set init params =============================================================================
 COLUMNS_IDS=$1; shift
 PROJ_DIR=$1; shift

@@ -22,7 +22,6 @@ else
 	STD_IMAGE=$FSL_DATA_STANDARD/MNI152_T1_2mm_brain
 fi
 
-#. $GLOBAL_SCRIPT_DIR/use_fsl 4
 # ==================================================================================
 . $GLOBAL_SCRIPT_DIR/utility_functions.sh
 . $GLOBAL_SCRIPT_DIR/subject_init_vars.sh
@@ -62,7 +61,6 @@ if [ -d "$DTI_DIR" ]; then
  fi
 fi
 
-. $GLOBAL_SCRIPT_DIR/use_fsl 5
 # =============================================
 # registration to MNI152_T1_2mm_brain (using subject T1_brain)
 
