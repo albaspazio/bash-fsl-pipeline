@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 if [ $# -lt 2 -o $# -gt 3 ]
 then
 	echo "usage: do_registration subj_name proj_dir std_image rs/fmri rs.ica/fmri.feat "
@@ -12,7 +13,10 @@ STD_IMAGE=$3
 
 main()
 {
-	if [ ! -f $T1_BRAIN_DATA ]; then return 0; fi
+	if [ ! -f $T1_BRAIN_DATA.nii.gz ]; then
+		echo "T1_BRAIN_DATA ($T1_BRAIN_DATA.nii.gz) is missing"
+		return 0; 
+	fi
 	
 	if [ -z $STD_IMAGE ]; then 
 		STD_IMAGE=$FSL_STANDARD_MNI_2mm
