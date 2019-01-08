@@ -92,53 +92,53 @@ do
   case "$1" in
   
   	# t1 preprocessing
-  	-skipanat)						DO_ANAT_PROC=0;;	
-		-nobias)							DO_BIAS_TYPE=0;;		# see subject_t1_processing.sh
-		-weakbias)						DO_BIAS_TYPE=1;;
-		-sienax)							DO_SIENAX=1
-													BET_PARAM_STRING="-B -f 0.20"; shift;;
-		-first) 							DO_FIRST=1;;
-		-firststructs) 				DO_FIRST=1
-													FIRST_STRUCTURES="-structs $2"; shift;;
-		-firstodn) 						DO_FIRST=1
-													FIRST_OUTPUT_DIR_NAME="-odn $2"; shift;;	
-		-freesurfer)					DO_FREESURFER_RECON=1; shift;;			
-		-stdimg) 							STANDARD_IMAGE=$2; shift;;
+  		-skipanat)				DO_ANAT_PROC=0;;	
+		-nobias)				DO_BIAS_TYPE=0;;		# see subject_t1_processing.sh
+		-weakbias)				DO_BIAS_TYPE=1;;
+		-sienax)				DO_SIENAX=1
+								BET_PARAM_STRING="-B -f 0.20"; shift;;
+		-first) 				DO_FIRST=1;;
+		-firststructs)			DO_FIRST=1
+								FIRST_STRUCTURES="-structs $2"; shift;;
+		-firstodn) 				DO_FIRST=1
+								FIRST_OUTPUT_DIR_NAME="-odn $2"; shift;;	
+		-freesurfer)			DO_FREESURFER_RECON=1; shift;;			
+		-stdimg) 				STANDARD_IMAGE=$2; shift;;
 		
 		# epi preprocessing
-		-epirm2vol)						DO_RMVOL_TO_NUM=$2;	shift;;
-		-skiparoma) 					DO_ICA_AROMA=0;;
-		-skipnuisance)				DO_NUISANCE=0;;			
-		-skippreproc)					DO_FEAT_PREPROC=0;;
-		-hpfsec)							HPF_SEC=$2; shift;;
-		-featpreprocodn)			DO_FEAT_PREPROC=1;
-													FEAT_PREPROC_OUTPUT_DIR_NAME=$2; shift;;		
+		-epirm2vol)				DO_RMVOL_TO_NUM=$2;	shift;;
+		-skiparoma) 			DO_ICA_AROMA=0;;
+		-skipnuisance)			DO_NUISANCE=0;;			
+		-skippreproc)			DO_FEAT_PREPROC=0;;
+		-hpfsec)				HPF_SEC=$2; shift;;
+		-featpreprocodn)		DO_FEAT_PREPROC=1;
+								FEAT_PREPROC_OUTPUT_DIR_NAME=$2; shift;;		
 		-featpreprocmodel)		DO_FEAT_PREPROC=1
-	  											FEAT_PREPROC_MODEL=$2; shift;;	
-		-featinitreg) 				DO_FEAT_PREPROC_INIT_REG=1;;  # valid also for melodic
+	  							FEAT_PREPROC_MODEL=$2; shift;;	
+		-featinitreg) 			DO_FEAT_PREPROC_INIT_REG=1;;  # valid also for melodic
 
 		# melodic													
-		-mel)									DO_MELODIC=1;;
-		-melodn)							DO_MELODIC=1
-	  											MELODIC_OUTPUT_DIR=$2; shift;;				
-		-melmodel)						DO_MELODIC=1
-	  											MELODIC_MODEL=$2; shift;;	
+		-mel)					DO_MELODIC=1;;
+		-melodn)				DO_MELODIC=1
+	  							MELODIC_OUTPUT_DIR=$2; shift;;				
+		-melmodel)				DO_MELODIC=1
+	  							MELODIC_MODEL=$2; shift;;	
 		# dti	
-		-bedx)								DO_BEDPOST=1; shift;;
-		-bedxodn)							DO_BEDPOST=1
-													BEDPOST_OUTDIR_NAME=$2; shift;;
-		-bedxcuda)						DO_BEDPOST_CUDA=1; shift;;
-		-bedxcudaodn)					DO_BEDPOST_CUDA=1
-													BEDPOST_OUTDIR_NAME=$2; shift;;				
-		-dtifit)							DO_DTIFIT=1;;			
-		-autoptx_tract)				DO_AUTOPTX_TRACT=1;;		
-		-structconn)					DO_STRUCT_CONN=1; 	
-													STRUCT_CONN_ATLAS_PATH=$2; shift;;
+		-bedx)					DO_BEDPOST=1; shift;;
+		-bedxodn)				DO_BEDPOST=1
+								BEDPOST_OUTDIR_NAME=$2; shift;;
+		-bedxcuda)				DO_BEDPOST_CUDA=1; shift;;
+		-bedxcudaodn)			DO_BEDPOST_CUDA=1
+								BEDPOST_OUTDIR_NAME=$2; shift;;				
+		-dtifit)				DO_DTIFIT=1;;			
+		-autoptx_tract)			DO_AUTOPTX_TRACT=1;;		
+		-structconn)			DO_STRUCT_CONN=1; 	
+								STRUCT_CONN_ATLAS_PATH=$2; shift;;
 		
-		-structconn_nroi)			STRUCT_CONN_ATLAS_NROI=$2; shift;;
+		-structconn_nroi)		STRUCT_CONN_ATLAS_NROI=$2; shift;;
 			
-		*)  									echo "ERROR: unrecognized input parameter($1)";
-													exit;;
+		*)  					echo "ERROR: unrecognized input parameter($1)";
+								exit;;
 	esac
 	shift
 done
@@ -149,8 +149,9 @@ if [ $DO_FIRST -eq 0 ]; then		fsl_anat_elem=`echo "$fsl_anat_elem --nosubcortseg
 if [ $DO_BIAS_TYPE -eq 0 ]; then fsl_anat_elem=`echo "$fsl_anat_elem --nobias"`; 			  
 elif [ $DO_BIAS_TYPE -eq 1 ]; then fsl_anat_elem=`echo "$fsl_anat_elem --weakbias"`;
 fi
-
-# ---- T1 data ---------------------------------------------------------
+#==============================================================================================================================================================
+#  T1 data 
+#==============================================================================================================================================================
 if [ -d "$T1_DIR" ]; then
 	mkdir -p $ROI_DIR/reg_t1
 	mkdir -p $ROI_DIR/reg_standard
@@ -164,7 +165,7 @@ if [ -d "$T1_DIR" ]; then
 	if [ $DO_SIENAX -eq 1 ]; then	
 	  echo "===========>>>> $SUBJ_NAME: sienax with $BET_PARAM_STRING"
  	 	$FSLDIR/bin/sienax $T1_DATA -B "$BET_PARAM_STRING" -r
-		rm $SIENAX_DIR/I.ni*
+		rm $SIENAX_DIR/I.nii*
 	fi
 	
 	. $GLOBAL_SUBJECT_SCRIPT_DIR/subject_transforms_calculate_t1.sh $SUBJ_NAME $PROJ_DIR
@@ -180,7 +181,9 @@ if [ -d "$T1_DIR" ]; then
  	fi
 fi
 
-# ---- WB data ---------------------------------------------------------
+#==============================================================================================================================================================
+# WB data 
+#==============================================================================================================================================================
 if [ -d "$WB_DIR" ]; then
   if [ `$FSLDIR/bin/imtest $WB_DATA` = 1 ]; then
   	if [ `$FSLDIR/bin/imtest $WB_BRAIN_DATA` = 0 ]; then
@@ -190,15 +193,15 @@ if [ -d "$WB_DIR" ]; then
   fi
 fi
 
-# ---- RS data ---------------------------------------------------------
+#==============================================================================================================================================================
+# RS data 
+#==============================================================================================================================================================
 if [ -d "$RS_DIR" ]; then
 
 	mkdir -p $ROI_DIR/reg_epi
   if [ 1 = 0 ];  then
 		echo "===========>>>> rs image $RS_DATA.nii.gz is missing...continuing"	  
 	else
-	
-
 		LOGFILE=$RS_DIR/log_epi_processing.txt
 		
 		run mkdir -p $PROJ_GROUP_ANALYSIS_DIR/melodic/dr
@@ -283,7 +286,9 @@ if [ -d "$RS_DIR" ]; then
   fi
 fi
 
-# ---- T2 data ---------------------------------------------------------
+#==============================================================================================================================================================
+# T2 data 
+#==============================================================================================================================================================
 if [ -d "$DE_DIR" ]; then
   if [ `$FSLDIR/bin/imtest $T2_DATA` = 1 ]; then
   	HAS_T2=1
@@ -295,7 +300,9 @@ if [ -d "$DE_DIR" ]; then
   fi
 fi
 
-# ---- DTI data ---------------------------------------------------------
+#==============================================================================================================================================================
+# DTI data
+#==============================================================================================================================================================
 if [ -d "$DTI_DIR" ]; then
   if [ "$(ls -A $DTI_DIR)" ]; then
   	if [ `$FSLDIR/bin/imtest $DTI_DIR/$DTI_FIT_LABEL"_FA"` = 0 -a $DO_DTIFIT -eq 1 ]; then

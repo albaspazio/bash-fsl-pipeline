@@ -57,7 +57,12 @@ run()
 {
   echo $@ >> $LOGFILE 
   $@
-  return 0
+    if [ $? -eq 0 ]; then
+        return 0
+    else
+        echo "error executing : $@"
+        return 1
+    fi  
 }
 
 

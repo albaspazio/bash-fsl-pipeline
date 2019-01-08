@@ -23,8 +23,6 @@ Usage() {
     echo "  -odn <output directory>      basename of directory for output (default is 'anat')"
     echo "  --overwrite                  overwrite each step of the pipeline, otherwise do a step only if requested and if the output is absent"
     echo "  --weakbias                   used for images with little and/or smooth bias fields"
-    echo "  --noreorient                 turn off step that does reorientation 2 standard (fslreorient2std)"
-    echo "  --nocrop                     turn off step that does automated cropping (robustfov)"
     #echo "  --nobet                      turn off step that does brain extraction (BET or registration) - to use this the input image must already brain extracted"
     echo "  --nobias                     turn off steps that do bias field correction (via FAST)"
     echo "  --noreg                      turn off steps that do registration to standard (FLIRT and FNIRT)"
@@ -96,8 +94,6 @@ while [ $# -ge 1 ] ; do
 			-s)					smooth=`get_arg2 $1 $2`; shift;;
 			-m)					use_lesionmask=yes; lesionmask=`get_arg2 $1 $2`; shift;;
 			--overwrite)		do_overwrite=yes;; 
-			--noreorient)  		do_reorient=no;;
-			--nocrop)			do_crop=no;;
 			--nobet)			do_bet=no;;
 			--noreg)			do_reg=no;;
 			--nononlinreg)  	do_nonlinreg=no;;
@@ -177,54 +173,10 @@ main()
 	#==================================================================================================================================================================
 	#==================================================================================================================================================================
 
+	# these 3 steps are now done in subject_t1_prepare.sh	
 	#### FIXING NEGATIVE RANGE
-	# required input: ${T1}
-	# output: ${T1}
-	minval=`$FSLDIR/bin/fslstats ${T1} -p 0`;
-	maxval=`$FSLDIR/bin/fslstats ${T1} -p 100`;
-	if [ X`echo "if ( $minval < 0 ) { 1 }" | bc -l` = X1 ] ; then
-		  if [ X`echo "if ( $maxval > 0 ) { 1 }" | bc -l` = X1 ] ; then
-				# if there are just some negative values among the positive ones then reset zero to the min value
-				run ${FSLDIR}/bin/fslmaths ${T1} -sub $minval ${T1} -odt float
-		  else
-				# if all values are negative then make them positive, but retain any zeros as zeros
-				run ${FSLDIR}/bin/fslmaths ${T1} -bin -binv zeromask
-				run ${FSLDIR}/bin/fslmaths ${T1} -sub $minval -mas zeromask ${T1} -odt float
-		  fi
-	fi
-
-
 	#### REORIENTATION 2 STANDARD
-	# required input: ${T1}
-	# output: ${T1} (modified) [ and ${T1}_orig and .mat ]
-
-	if [ ! -f ${T1}_orig2std.mat -o $do_overwrite = yes ]; then
-		if [ $do_reorient = yes ] ; then
-			date; echo "$SUBJ_NAME :Reorienting to standard orientation"
-		  run $FSLDIR/bin/fslmaths ${T1} ${T1}_orig
-			run $FSLDIR/bin/fslreorient2std ${T1} > ${T1}_orig2std.mat
-			run $FSLDIR/bin/convert_xfm -omat ${T1}_std2orig.mat -inverse ${T1}_orig2std.mat
-			run $FSLDIR/bin/fslreorient2std ${T1} ${T1} 
-		fi
-	fi
-
-
 	#### AUTOMATIC CROPPING
-	# required input: ${T1}
-	# output: ${T1} (modified) [ and ${T1}_fullfov plus various .mats ]
-	if [ `$FSLDIR/bin/imtest ${T1}_fullfov` = 0 -o $do_overwrite = yes ]; then
-		if [ $do_crop = yes ] ; then
-		  date; echo "$SUBJ_NAME :Automatically cropping the image"
-		  run $FSLDIR/bin/immv ${T1} ${T1}_fullfov
-		  run $FSLDIR/bin/robustfov -i ${T1}_fullfov -r ${T1} -m ${T1}_roi2nonroi.mat | grep [0-9] | tail -1 > ${T1}_roi.log
-		  # combine this mat file and the one above (if generated)
-		  if [ $do_reorient = yes ] ; then
-				run $FSLDIR/bin/convert_xfm -omat ${T1}_nonroi2roi.mat -inverse ${T1}_roi2nonroi.mat
-				run $FSLDIR/bin/convert_xfm -omat ${T1}_orig2roi.mat -concat ${T1}_nonroi2roi.mat ${T1}_orig2std.mat 
-				run $FSLDIR/bin/convert_xfm -omat ${T1}_roi2orig.mat -inverse ${T1}_orig2roi.mat
-		  fi
-		fi
-	fi
 
 
 	### LESION MASK

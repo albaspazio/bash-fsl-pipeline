@@ -2,20 +2,28 @@
 
 
 case "$1" in
-	5) FSLDIR=/usr/local/fsl
-
+	5) 
+		FSLDIR=/usr/local/fsl
 		. ${FSLDIR}/etc/fslconf/fsl.sh
-#		PATH=/usr/prog/bin:/usr/prog/script_shell:/usr/local/bin:${FSLDIR}/bin:/usr/bin:/bin
-		export FSLDIR
 		PATH=${FSLDIR}/bin:${PATH}
-		FSL_VER="5"
+		FSL_VER="5.0.9"
+		export FSLDIR PATH FSL_VER
 		;;
-	4) FSLDIR=/usr/local/fsl
+
+	5.0.11) 
+		FSLDIR=/usr/local/fsl-5.0.11
 		. ${FSLDIR}/etc/fslconf/fsl.sh
-#		PATH=/usr/prog/bin:/usr/prog/script_shell:/usr/local/bin:${FSLDIR}/bin:/usr/bin:/bin
-		export FSLDIR
 		PATH=${FSLDIR}/bin:${PATH}
-		FSL_VER="5"
+		FSL_VER="5.0.11"
+		export FSLDIR PATH FSL_VER
+		;;
+
+	6) 
+		FSLDIR=/usr/local/fsl-6.0
+		. ${FSLDIR}/etc/fslconf/fsl.sh
+		PATH=${FSLDIR}/bin:${PATH}
+		FSL_VER="6.0.0"
+		export FSLDIR PATH FSL_VER
 		;;
 		 
 #		FSLDIR=/usr/local/fsl
@@ -30,10 +38,12 @@ case "$1" in
 		echo
 		echo "Usage: . use_fsl *version*"
 		echo
-		echo "presently only version 5.0.9 is installed"
+		echo "presently, only version 5 (5.0.9), 5.0.11 and 6 (6.0.0) are installed"
 		echo
 		;;
 esac
+
+echo "using FSL v.$FSL_VER"
 
 
 
