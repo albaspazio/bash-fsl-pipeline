@@ -47,6 +47,8 @@ declare -i NUM_GROUPS=1 	# derived from groupslastids, store the number of group
  							# covariates/nuisance regressors will be appended starting from the (NUM_GROUPS+1)th column_id													
 multiple_groups_string=""	# string to be passed to create_Ncov_Xnuisance_glm_file that contain the -groupslastids option
 STANDARD_IMAGE=$FSL_STANDARD_MNI_2mm
+MASK_IMAGE=""
+
 declare -i NUM_COPES=0
 
 while [ ! -z "$1" ]
@@ -71,7 +73,11 @@ do
     -stdimg) 		STANDARD_IMAGE=$2
       				if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
 					shift;;		
-															
+			
+    -maskimg)	MASK_IMAGE=$2
+      			if [ `$FSLDIR/bin/imtest $MASK_IMAGE` = 0 ]; then echo "mask image ($MASK_IMAGE) specified but non present....exiting "; exit; fi
+				shift;;									
+																		
     *) 				break;;
   esac
   shift
@@ -180,6 +186,10 @@ done
 echo "set fmri(npts) $cnt" >> $DEST_FSF
 echo "set fmri(multiple) $cnt" >> $DEST_FSF
 echo "set fmri(outputdir) \"$FINAL_OUTPUT_DIR\"" >> $DEST_FSF
+
+if [ ! -z $MASK_IMAGE ]; then
+	echo "set fmri(threshmask) 	\"$MASK_IMAGE\"" >> $OUTPUT_DIR.fsf
+fi
 
 
 echo "starting GROUP FEAT with model: $templ_name on output $FINAL_OUTPUT_DIR"

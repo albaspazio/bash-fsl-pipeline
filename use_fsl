@@ -19,10 +19,10 @@ case "$1" in
 		;;
 
 	6) 
-		FSLDIR=/usr/local/fsl-6.0
+		FSLDIR=/usr/local/fsl-6.0.1
 		. ${FSLDIR}/etc/fslconf/fsl.sh
 		PATH=${FSLDIR}/bin:${PATH}
-		FSL_VER="6.0.0"
+		FSL_VER="6.0.1"
 		export FSLDIR PATH FSL_VER
 		;;
 		 
