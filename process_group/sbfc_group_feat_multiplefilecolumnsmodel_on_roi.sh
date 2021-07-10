@@ -36,6 +36,9 @@ EOF
 COLUMNS_IDS=$1; shift
 PROJ_DIR=$1; shift
 
+
+# echo $@
+# exit
 #--------------------------------------------
 if [[ $INIT_VARS_DEFINED != 1 ]]; then
   . /media/data/MRI/script/init/init_vars.sh

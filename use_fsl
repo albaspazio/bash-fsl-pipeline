@@ -3,7 +3,7 @@
 
 case "$1" in
 	5) 
-		FSLDIR=/usr/local/fsl
+		FSLDIR=/usr/local/fsl-5.0.9
 		. ${FSLDIR}/etc/fslconf/fsl.sh
 		PATH=${FSLDIR}/bin:${PATH}
 		FSL_VER="5.0.9"

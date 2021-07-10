@@ -9,64 +9,67 @@
 #		-son		extra series name : 
 # ===== check parameters ==============================================================================
 usage_string="$0 subj_label proj_dir -i input_ffd_name -f denoised_folder_postfix_name -o output_postfixname_series_and_folder or $0 subj_label proj_dir -p full_input_image_path -o output_postfixname_series_and_folder"
+#echo "input params : $@"
 # ====== set init params =============================================================================
+
+. $GLOBAL_SCRIPT_DIR/utility_functions.sh
 
 SUBJ_NAME=$1; shift
 PROJ_DIR=$1; shift
 
 . $GLOBAL_SCRIPT_DIR/subject_init_vars.sh
 
-
-echo "input params : $@"
-
 SERIES_POSTFIX_NAME=""
-INPUT_FILE_NAME=nuisance_10000.nii.gz
-input_rs_image=$SBFC_DIR/$INPUT_FILE_NAME
+INPUT_FILE_NAME=$RS_POST_NUISANCE_IMAGE_LABEL
 INPUT_ROI_DIR=$ROI_DIR/reg_epi
-FSF_TEMPL_FILE=$PROJ_SCRIPT_DIR/glm/templates/template_feat_roi.fsf
+FSF_TEMPL_FILE=$PROJ_SCRIPT_DIR/glm/templates/template_feat_roi #sbfc_3_feat_1roi 
+STD_IMAGE=$FSL_DATA_STANDARD/MNI152_T1_2mm_brain
+OUTPUT_DIR_NAME="feat_multiroi"
 
 while [ ! -z "$1" ]
 do
   case "$1" in
-  
-      -ifn) 	INPUT_FILE_NAME=$2
-							input_rs_image=$SBFC_DIR/$INPUT_FILE_NAME;
-      				shift;;
+      -ifn) 		INPUT_FILE_NAME=$2; shift;;
 
-      -ifp) 	input_rs_image=$SUBJECT_DIR/$2
-      				shift;;
+      -idp)			INPUT_ROI_DIR=$2
+      					if [ ! -d $INPUT_ROI_DIR ]; then echo "ERROR, input roi dir ($INPUT_ROI_DIR) does not exist.....exiting"; exit; fi
+      					shift;;
 
-      -idp)		INPUT_ROI_DIR=$2
-      				if [ ! -d $INPUT_ROI_DIR ]; then echo "ERROR, input roi dir ($INPUT_ROI_DIR) does not exist.....exiting"; exit; fi
-      				shift;;
-      				      		
-      -odn) 	OUTPUT_DIR_NAME=$2
-							output_feat_dir=$SBFC_DIR/feat/$OUTPUT_DIR_NAME
-							shift;;
-					
-      -model) FSF_TEMPL_FILE=$2
-      				if [ ! -f $FSF_TEMPL_FILE.fsf ]; then echo "ERROR, input FSF template ($FSF_TEMPL_FILE.fsf) do not exist.....exiting"; exit; fi
-      				shift;;
-      		
-      -son) 	SERIES_POSTFIX_NAME="_"$2;shift;;
+      -model) 	FSF_TEMPL_FILE=$2
+      					if [ ! -f $FSF_TEMPL_FILE.fsf ]; then echo "ERROR, input FSF template ($FSF_TEMPL_FILE.fsf) do not exist.....exiting"; exit; fi
+      					shift;;
+
+      -son) 		SERIES_POSTFIX_NAME="_"$2; shift;;
+
+      -stdimg)	STD_IMAGE=$2; shift;;
+
+      -odn) 		OUTPUT_DIR_NAME=$2; shift;;
       
-      -ridn) 	ROI_INPUT_DIR_NAME="$2";
-							INPUT_ROI_DIR=$SUBJECT_DIR/$ROI_INPUT_DIR_NAME
-							shift;;
+      -ridn) 		ROI_INPUT_DIR_NAME="$2";
+								INPUT_ROI_DIR=$SUBJECT_DIR/$ROI_INPUT_DIR_NAME
+								shift;;
       
-      *) 			break;;
+      *) 				break;;
   esac
   shift
 done
+# remaining parameters are roi name (located in: $INPUT_ROI_DIR)
+#============================================================================================================================================
 
+# input image
+input_rs_image=$RS_DIR/$INPUT_FILE_NAME
+if [ `$FSLDIR/bin/imtest $input_rs_image` = 0 ]; then echo "ERROR, input file name ($input_rs_image) does not exist.....exiting"; exit; fi
+TOT_VOL_NUM=`fslnvols $input_rs_image`
 
-if [ `$FSLDIR/bin/imtest $input_rs_image` = 0 ]; then echo "ERROR, input file name ($input_rs_image) do not exist.....exiting"; exit; fi
+# output dir
+if [ -z $OUTPUT_DIR_NAME ]; then echo "ERROR, OUTPUT dir name ($OUTPUT_DIR_NAME) is empty.....exiting"; exit; fi
+OUTPUT_DIR=$SBFC_DIR/feat/feat_$OUTPUT_DIR_NAME$SERIES_POSTFIX_NAME
 
+# fsf
+DEST_FSF=$SBFC_DIR/feat_$OUTPUT_DIR_NAME$SERIES_POSTFIX_NAME
+cp $FSF_TEMPL_FILE.fsf $DEST_FSF.fsf
+if [ ! -f $DEST_FSF.fsf ]; then echo "ERROR in creating dest fsf file.....exiting"; exit; fi
 
-
-declare -a INPUT_ROI=( $@ )
-declare -i NUM_ROIS=${#INPUT_ROI[@]}
-declare -i NUM_CONTRASTS=2*$NUM_ROIS
 
 init_data()
 {
@@ -132,16 +135,11 @@ create_regressor_data()
 	echo "set fmri(conname_orig.$row) c${col}_neg" >> $DEST_FSF.fsf
 
 }
-# ===============================================================================
-# check inputs
-if [ -z $OUTPUT_DIR_NAME ]; then echo "ERROR, OUTPUT dir name ($OUTPUT_DIR_NAME) is empty.....exiting"; exit; fi
-# ===============================================================================
-DEST_FSF=$SBFC_DIR/feat_$OUTPUT_DIR_NAME
-output_series_path=$SBFC_DIR/series
-TOT_VOL_NUM=`fslnvols $input_rs_image`
 
-cp $FSF_TEMPL_FILE.fsf $DEST_FSF.fsf
-if [ ! -f $DEST_FSF.fsf ]; then echo "ERROR in creating dest fsf file.....exiting"; exit; fi
+
+declare -a INPUT_ROI=( $@ )
+declare -i NUM_ROIS=${#INPUT_ROI[@]}
+declare -i NUM_CONTRASTS=2*$NUM_ROIS
 
 echo "" >> $DEST_FSF.fsf
 echo "################################################################" >> $DEST_FSF.fsf
@@ -155,8 +153,8 @@ echo "set fmri(multiple) 1" >> $DEST_FSF.fsf
 echo "set fmri(npts) $TOT_VOL_NUM" >> $DEST_FSF.fsf
 echo "set feat_files(1) $input_rs_image" >> $DEST_FSF.fsf
 echo "set highres_files(1) $T1_BRAIN_DATA" >> $DEST_FSF.fsf
-echo "set fmri(outputdir) $output_feat_dir" >> $DEST_FSF.fsf
-echo "set fmri(regstandard) $FSL_DATA_STANDARD/MNI152_T1_2mm_brain" >> $DEST_FSF.fsf
+echo "set fmri(outputdir) $OUTPUT_DIR" >> $DEST_FSF.fsf
+echo "set fmri(regstandard) $STD_IMAGE" >> $DEST_FSF.fsf
 
 echo "set fmri(evs_orig) $NUM_ROIS" >> $DEST_FSF.fsf
 echo "set fmri(evs_real) $NUM_ROIS" >> $DEST_FSF.fsf
@@ -166,6 +164,7 @@ echo "set fmri(ncon_real) $NUM_CONTRASTS" >> $DEST_FSF.fsf
 
 
 # extract ROI timeseries & add file 2 model
+output_series_path=$SBFC_DIR/series
 declare -i cnt=1
 for ROI_NAME in ${INPUT_ROI[@]}
 do
@@ -180,5 +179,5 @@ done
 
 echo "subj:$SUBJ_NAME, starting ROI FEAT: ${INPUT_ROI[@]}"
 $FSLDIR/bin/feat $DEST_FSF.fsf
-$FSLDIR/bin/featregapply $output_feat_dir.feat	
+$FSLDIR/bin/featregapply $OUTPUT_DIR.feat	
 

@@ -122,8 +122,8 @@ if [[ $IMAGES_LIST != "" ]]; then
   if [ $SHOW_IMAGE -eq 1 ]; then
     echo "displaying folder $INPUT_FOLDER"
     
-    if [ -f $FSLDIR/bin/fslview ]; then $FSLDIR/bin/fslview $BACKGROUND_IMAGE $IMAGES_LIST & 
-    else  fslview $BACKGROUND_IMAGE $IMAGES_LIST & 
+    if [ -f $FSLDIR/bin/fslview_deprecated ]; then $FSLDIR/bin/fslview_deprecated $BACKGROUND_IMAGE $IMAGES_LIST & 
+    else  fslview_deprecated $BACKGROUND_IMAGE $IMAGES_LIST & 
     fi
     
     echo "--------------------------------------------------------------------------------------" >> $result_file

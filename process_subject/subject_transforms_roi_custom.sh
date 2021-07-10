@@ -93,6 +93,7 @@ for roi in ${ROI[@]};	do
 	if [ $do_linear -eq 0 ]; then
 		$FSLDIR/bin/applywarp -i $input_roi -r $ref -o $output_roi --warp=$transformation
 	else
+		#echo "$FSLDIR/bin/flirt -in $input_roi -ref $ref -out $output_roi -applyxfm -init $transformation -interp trilinear"
 		$FSLDIR/bin/flirt -in $input_roi -ref $ref -out $output_roi -applyxfm -init $transformation -interp trilinear
 	fi
 
