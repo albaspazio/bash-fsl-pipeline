@@ -42,6 +42,7 @@ declare -i NUM_COPES=1
 GROUPSLASTSIDS=""					# comma-separated string contaning the ID of the last subject of each group.
 													# eg: 3 groups  "18,38,52" = 1-18: first group, 19-38: second group, 39-52: third group		
 OUTPUT_DIR_NAME=""													
+MASK_IMAGE=""
 
 while [ ! -z "$1" ]
 do
@@ -65,7 +66,11 @@ do
       -stdimg) 					STANDARD_IMAGE=$2
       									if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
 												shift;;		
-															
+			
+    -maskimg)	MASK_IMAGE=$2
+      			if [ `$FSLDIR/bin/imtest $MASK_IMAGE` = 0 ]; then echo "mask image ($MASK_IMAGE) specified but non present....exiting "; exit; fi
+				shift;;									
+																		
       *) 								break;;
   esac
   shift
@@ -158,6 +163,10 @@ done
 echo "set fmri(npts) $cnt" >> $OUTPUT_DIR.fsf
 echo "set fmri(multiple) $cnt" >> $OUTPUT_DIR.fsf
 echo "set fmri(outputdir) \"$OUTPUT_DIR\"" >> $OUTPUT_DIR.fsf
+
+if [ ! -z $MASK_IMAGE ]; then
+	echo "set fmri(threshmask) 	\"$MASK_IMAGE\"" >> $OUTPUT_DIR.fsf
+fi
 
 
 echo "starting GROUP FEAT with model: ${ROI_FEAT_FOLDER_NAME}_${new_templ_name} on output $OUTPUT_DIR"

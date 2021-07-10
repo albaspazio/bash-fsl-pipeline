@@ -38,6 +38,8 @@ fi
 OUTPUT_ROOT_DIR=$PROJ_GROUP_ANALYSIS_DIR/sbfc
 declare -i NUM_SUBJ=0 		# if 0, accept the input fsf as is, otherwise call the glm script to create a new one according to subject number
 STANDARD_IMAGE=$FSL_STANDARD_MNI_2mm
+MASK_IMAGE=""
+
 declare -i NUM_COPES=1
 
 while [ ! -z "$1" ]
@@ -62,7 +64,11 @@ do
       -stdimg) 					STANDARD_IMAGE=$2
       									if [ `$FSLDIR/bin/imtest $STANDARD_IMAGE` = 0 ]; then echo "custom standard image ($STANDARD_IMAGE) non present....exiting "; exit; fi
 												shift;;		
-															
+			
+    -maskimg)	MASK_IMAGE=$2
+      			if [ `$FSLDIR/bin/imtest $MASK_IMAGE` = 0 ]; then echo "mask image ($MASK_IMAGE) specified but non present....exiting "; exit; fi
+				shift;;									
+																
       *) 								break;;
   esac
   shift
@@ -155,6 +161,10 @@ done
 echo "set fmri(npts) $cnt" >> $OUTPUT_DIR.fsf
 echo "set fmri(multiple) $cnt" >> $OUTPUT_DIR.fsf
 echo "set fmri(outputdir) \"$OUTPUT_DIR\"" >> $OUTPUT_DIR.fsf
+
+if [ ! -z $MASK_IMAGE ]; then
+	echo "set fmri(threshmask) 	\"$MASK_IMAGE\"" >> $OUTPUT_DIR.fsf
+fi
 
 
 echo "starting GROUP FEAT with model: ${ROI_FEAT_FOLDER_NAME}_${new_templ_name} on output $OUTPUT_DIR"
